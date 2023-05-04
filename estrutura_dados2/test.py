@@ -1,0 +1,16 @@
+from ABP import Nodo
+
+nodo = Nodo(8)
+nodo.insert_child(3)
+nodo.insert_child(10)
+nodo.insert_child(1)
+nodo.insert_child(6)
+nodo.insert_child(4)
+nodo.insert_child(14)
+nodo.insert_child(7)
+nodo.insert_child(15)
+nodo.insert_child(13)
+nodo.insert_child(9)
+nodo.search(15)
+nodo.remove(15)
+nodo.search(15)
