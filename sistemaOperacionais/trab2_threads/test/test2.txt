@@ -1,0 +1,8 @@
+arquivo de teste
+para ver o se
+consegue
+ler
+dois
+arquivos
+diferentes que estao em um 
+mesmo diretorio
