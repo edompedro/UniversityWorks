@@ -52,5 +52,5 @@ aprox_inicial = 1.5 #valor
 tolerancia = ERRO
 
 raiz_aproximada = metodo_newton(aprox_inicial, tolerancia)  #chama a função para o método
-print("Raiz aproximada:", raiz_aproximada)    #printa a raiz encontrada
+print("Raiz aproximada: ", raiz_aproximada)    #printa a raiz encontrada
 

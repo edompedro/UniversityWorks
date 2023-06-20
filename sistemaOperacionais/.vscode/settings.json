@@ -1,5 +1,8 @@
 {
     "files.associations": {
         "ratio": "c"
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./trab3_escalonador/escalonador-emojicoders/classes"
+    ]
 }
