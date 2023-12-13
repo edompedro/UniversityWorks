@@ -12,13 +12,14 @@ class ÇLexer(Lexer):
     
     # token definitions
     literals = {';', '+', '-', '*', '/', '%', '(', ')', '{', '}', ',', '=', '[', ']'}
-    tokens = {STDIO, INT, MAIN, PRINTF, STRING, NUMBER, NAME, IF, COMP, WHILE}
+    tokens = {STDIO, INT, MAIN, PRINTF, STRING, NUMBER, NAME, IF, COMP, WHILE, VOID}
     STDIO   = '#include <stdio.h>'
     INT     = 'int'
     MAIN    = 'main'
     PRINTF  = 'printf'
     IF      = 'if'
     WHILE   = 'while'
+    VOID    = 'void'
     COMP    = r'(==|!=|>=|<=|<|>)'    
     STRING  = r'"[^"]*"'
     NUMBER  = r'\d+'
@@ -60,11 +61,54 @@ class ÇParser(Parser):
         
     # ---------------- program ----------------
 
-    @_('STDIO main')
+    @_('STDIO functions main')
     def program(self, p):
         print('\n# symbol_table: ', self.variables_list)
 
-    # ---------------- main ----------------
+    # @_('STDIO')
+    # def stdio(self, p):
+    #     print('LOAD_CONST 0')
+    #     print('LOAD_CONST None')
+    #     print('IMPORT_NAME runtime')
+    #     print('IMPORT_START')
+
+    # ---------------- functions --------------
+
+    @_('function functions')
+    def functions(self, p):
+        pass
+
+    @_('')
+    def functions(self, p):
+        pass
+
+    @_('NAME')
+    def function_name(self,p):
+        print('.begin', p.NAME)
+
+    @_('VOID function_name  "(" parameters ")" "{" statements "}"')
+    def function(self, p):
+        print('LOAD_CONST None')
+        print('RETURN_VALUE')
+        print('.end ')
+
+    # ---------------- parameters --------------
+
+    @_('')
+    def parameters(self, p):
+        pass
+
+    @_('INT NAME')
+    def parameters(self, p):
+        print('STORE_NAME', p.NAME)
+        self.variables_list.append(p.NAME)
+
+    @_('INT NAME "," parameters')
+    def parameters(self, p):
+        print('STORE_NAME', p.NAME)
+        self.variables_list.append(p.NAME)
+
+    # ---------------- main -------------------
 
     @_('INT MAIN "(" ")" "{" statements "}"')
     def main(self, p):
@@ -78,6 +122,10 @@ class ÇParser(Parser):
         pass
 
     @_('')
+    def statements(self, p):
+        pass
+
+    @_('function')
     def statements(self, p):
         pass
 
@@ -102,6 +150,11 @@ class ÇParser(Parser):
     @_('while_st')
     def statement(self, p):
         print()
+
+    @_('call')
+    def statement(self, p):
+        print()
+
     # ---------------- printf ----------------
 
     @_('STRING')
@@ -114,6 +167,28 @@ class ÇParser(Parser):
         print('BINARY_MODULO')
         print('CALL_FUNCTION', 1)
         print('POP_TOP')
+
+    # ---------------- call ----------------
+
+    @_('NAME "(" arguments ")" ";"')
+    def call(self, p):
+        print('LOAD_NAME', p.NAME)
+        print('CALL_FUNCTION', 0)
+        print('POP_TOP')
+
+    # ---------------- arguments ----------------
+
+    @_('')
+    def arguments(self, p):
+        pass
+
+    @_('expression')
+    def arguments(self, p):
+        pass
+
+    @_('expression "," arguments')
+    def arguments(self, p):
+        pass
 
     # ---------------- declaration ----------------
     
