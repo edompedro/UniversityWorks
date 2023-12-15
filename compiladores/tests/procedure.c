@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 void procedure() {
-    int b = 3;
+    int b = 2;
     printf("%d\n", b);
 }
 

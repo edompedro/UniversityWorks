@@ -86,8 +86,9 @@ class ÇParser(Parser):
     @_('NAME  "(" parameters ")"')
     def function_name(self,p):
         print('.begin', p.NAME, p.parameters)
-        for i in range(len(p.parameters.split(' '))):
-            self.variables_list.append(p.parameters.split()[i])
+        if p.parameters != '':
+            for i in range(len(p.parameters.split(' '))):
+                self.variables_list.append(p.parameters.split()[i])
         # print(self.variables_list)
 
     @_('VOID function_name "{" statements "}"')
