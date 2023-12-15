@@ -1,0 +1,136 @@
+{
+    "prob_id": {
+        "3200": {
+            "country": "usa",
+            "continent": "North America"
+        },
+        "33230": {
+            "country": "chile",
+            "continent": "South America"
+        },
+        "51527": {
+            "country": "chile",
+            "continent": "South America"
+        },
+        "33690": {
+            "country": "chile",
+            "continent": "South America"
+        },
+        "62657": {
+            "country": "canada",
+            "continent": "North America"
+        },
+        "60579": {
+            "country": "canada",
+            "continent": "North America"
+        },
+        "50593": {
+            "country": "canada",
+            "continent": "North America"
+        },
+        "60900": {
+            "country": "spain",
+            "continent": "Europe"
+        },
+        "60374": {
+            "country": "spain",
+            "continent": "Europe"
+        },
+        "14842": {
+            "country": "spain",
+            "continent": "Europe"
+        },
+        "1005758": {
+            "country": "germany",
+            "continent": "Europe"
+        },
+        "61177": {
+            "country": "germany",
+            "continent": "Europe"
+        },
+        "1006471": {
+            "country": "germany",
+            "continent": "Europe"
+        },
+        "50525": {
+            "country": "denmark",
+            "continent": "Europe"
+        },
+        "4914": {
+            "country": "denmark",
+            "continent": "Europe"
+        },
+        "53022": {
+            "country": "denmark",
+            "continent": "Europe"
+        },
+        "1003520": {
+            "country": "russia",
+            "continent": "Europe"
+        },
+        "55234": {
+            "country": "russia",
+            "continent": "Europe"
+        },
+        "14015": {
+            "country": "russia",
+            "continent": "Europe"
+        },
+        "24300": {
+            "country": "japan",
+            "continent": "Asia"
+        },
+        "1006691": {
+            "country": "japan",
+            "continent": "Asia"
+        },
+        "1005715": {
+            "country": "japan",
+            "continent": "Asia"
+        },
+        "1001577": {
+            "country": "india",
+            "continent": "Asia"
+        },
+        "1005735": {
+            "country": "india",
+            "continent": "Asia"
+        },
+        "1004568": {
+            "country": "india",
+            "continent": "Asia"
+        },
+        "1003619": {
+            "country": "india",
+            "continent": "Asia"
+        },
+        "53613": {
+            "country": "india",
+            "continent": "Asia"
+        },
+        "22850": {
+            "country": "fiji",
+            "continent": "Oceania"
+        },
+        "32810": {
+            "country": "fiji",
+            "continent": "Oceania"
+        },
+        "24944": {
+            "country": "fiji",
+            "continent": "Oceania"
+        },
+        "1003564": {
+            "country": "brazil",
+            "continent": "South America"
+        },
+        "1002617": {
+            "country": "brazil",
+            "continent": "South America"
+        },
+        "22702": {
+            "country": "brazil",
+            "continent": "South America"
+        }
+    }
+}
