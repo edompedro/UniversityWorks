@@ -61,16 +61,17 @@ class ÇParser(Parser):
         
     # ---------------- program ----------------
 
-    @_('STDIO functions main')
+    @_('stdio functions main')
     def program(self, p):
         print('\n# symbol_table: ', self.variables_list)
 
-    # @_('STDIO')
-    # def stdio(self, p):
-    #     print('LOAD_CONST 0')
-    #     print('LOAD_CONST None')
-    #     print('IMPORT_NAME runtime')
-    #     print('IMPORT_START')
+    @_('STDIO')
+    def stdio(self, p):
+        print('LOAD_CONST 0')
+        print('LOAD_CONST None')
+        print('IMPORT_NAME runtime')
+        print('IMPORT_STAR')
+        print()
 
     # ---------------- functions --------------
 
@@ -82,31 +83,35 @@ class ÇParser(Parser):
     def functions(self, p):
         pass
 
-    @_('NAME')
+    @_('NAME  "(" parameters ")"')
     def function_name(self,p):
-        print('.begin', p.NAME)
+        print('.begin', p.NAME, p.parameters)
+        if p.parameters != '':
+            for i in range(len(p.parameters.split(' '))):
+                self.variables_list.append(p.parameters.split()[i])
+        # print(self.variables_list)
 
-    @_('VOID function_name  "(" parameters ")" "{" statements "}"')
+    @_('VOID function_name "{" statements "}"')
     def function(self, p):
         print('LOAD_CONST None')
         print('RETURN_VALUE')
         print('.end ')
+        print('\n# symbol_table: ', self.variables_list)
+        self.variables_list.clear()
 
     # ---------------- parameters --------------
 
     @_('')
     def parameters(self, p):
-        pass
+        return ''
 
     @_('INT NAME')
     def parameters(self, p):
-        print('STORE_NAME', p.NAME)
-        self.variables_list.append(p.NAME)
+        return p.NAME
 
     @_('INT NAME "," parameters')
     def parameters(self, p):
-        print('STORE_NAME', p.NAME)
-        self.variables_list.append(p.NAME)
+        return p.NAME + ' ' + p.parameters
 
     # ---------------- main -------------------
 
@@ -114,6 +119,7 @@ class ÇParser(Parser):
     def main(self, p):
         print('LOAD_CONST None')
         print('RETURN_VALUE')
+
 
     # ---------------- statements ----------------
 
@@ -169,26 +175,30 @@ class ÇParser(Parser):
         print('POP_TOP')
 
     # ---------------- call ----------------
-
-    @_('NAME "(" arguments ")" ";"')
-    def call(self, p):
+        
+    @_('NAME')
+    def call_name(self, p):
         print('LOAD_NAME', p.NAME)
-        print('CALL_FUNCTION', 0)
+
+    @_('call_name "(" arguments ")" ";"')
+    def call(self, p):
+        # print('LOAD_NAME', p.NAME)
+        print('CALL_FUNCTION', p.arguments)
         print('POP_TOP')
 
     # ---------------- arguments ----------------
 
     @_('')
     def arguments(self, p):
-        pass
+        return 0
 
     @_('expression')
     def arguments(self, p):
-        pass
+        return 1
 
     @_('expression "," arguments')
     def arguments(self, p):
-        pass
+        return 1+p.arguments
 
     # ---------------- declaration ----------------
     
@@ -210,6 +220,19 @@ class ÇParser(Parser):
             self.variables_list.append(p.NAME)
             self.array_counter = 0
     
+    # ---------------- declaration empty array ----------------
+
+    @_('INT NAME "[" array_size expression "]" ";"')
+    def declaration(self, p):
+        if (p.NAME in self.variables_list):
+            self.show_error(f"cannot redeclare variable '{p.NAME}'", p.lineno)
+        self.variables_list.append(p.NAME)
+        print('CALL_FUNCTION', 1)
+        print('STORE_NAME', p.NAME)
+    
+    @_('')
+    def array_size(self, p):
+        print("LOAD_NAME array_zero")
     # ---------------- attribution ----------------
 
     @_('NAME "=" expression ";"')

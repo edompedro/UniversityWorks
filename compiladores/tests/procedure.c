@@ -2,11 +2,11 @@
 
 #include <stdio.h>
 
-void procedure(int a) {
-    int b = 3;
-    printf("%d\n", a + b);
+void procedure() {
+    int b = 2;
+    printf("%d\n", b);
 }
 
 int main() {
-    procedure(2);
+    procedure();    
 }
