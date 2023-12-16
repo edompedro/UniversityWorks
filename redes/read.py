@@ -1,13 +1,8 @@
 import json
-from matplotlib.cbook import get_sample_data
-from matplotlib.offsetbox import AnnotationBbox, OffsetImage
-from PIL import Image
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import json
-import datetime
 
 # Carregar dados do JSON
 with open('RIPE-Atlas-measurement-64470119.json') as f:
@@ -66,6 +61,10 @@ with open('country.json') as f:
 # Adicionar o país ao rtt_dict
 for prob_id, values in rtt_dict.items():
     country_code = country_data['prob_id'][prob_id]['country']
+    city_code = country_data['prob_id'][prob_id]['city']
+    continent_code = country_data['prob_id'][prob_id]['continent']
+    values['continent'] = continent_code
+    values['city'] = city_code
     values['country'] = country_code
 
 
@@ -84,67 +83,37 @@ for country in countries:
             # if counter == 2:
             m = min(values['timestamp'])
             v = [int(i) - int(m) for i in values['timestamp']]
-            ax.plot( values['rtt'], label=f'prob_id: {prob_id}')
+            ax.plot( values['rtt'], label=f'city: {values["city"]}')
             # counter += 1
     ax.set_xlabel('Timestamp')
     ax.set_ylabel('RTT')
     ax.set_title(f'Variation of RTT over Time for {country}')
     ax.legend()
     plt.tight_layout()
+    plt.show()  
+
+# Plotar gráfico de linhas para cada prob_id por continente
+for continent_code in set(values['continent'] for values in rtt_dict.values()):
+    fig, ax = plt.subplots(figsize=(10, 5))
+    for prob_id, values in rtt_dict.items():
+        if values['continent'] == continent_code:
+            # ax.plot(values['timestamp'], values['rtt'], label=f'prob_id {prob_id}')
+            m = min(values['timestamp'])
+            v = [int(i) - int(m) for i in values['timestamp']]
+            ax.plot( values['rtt'], label=f'country: {values["country"]}\ncity: {values["city"]}')
+    ax.set_xlabel('Timestamp')
+    ax.set_ylabel('RTT')
+    ax.set_title(f'Variation of RTT over Time for Continent {continent_code}')
+    ax.legend()
+    plt.tight_layout()
     plt.show()
-
-# #plotar o grafico relacionando o rtt ao longo do tempo para cada pais, onde cada prob_id do pais é uma linha
-# countries = ['brazil', 'canada', 'chile','denmark','fiji','germany','india','japan','russia','spain','usa']
-# for country in countries:
-#     print("Pais: ", country)
-#     # print(rtt_dict.items())
-#     for prob_id, values in rtt_dict.items():
-#         # print(values['rtt'])
-#         if values['country'] == country:
-#             # print("timestamp: ", values['timestamp'])
-#             # print("rtt: ", values['rtt'])
-
-#             #verify with timestamp  is in order
-#             flag = False
-#             for i in range(len(values['timestamp'])-1):
-#                 if values['timestamp'][i] > values['timestamp'][i+1]:
-#                     flag = True
-#                     break
-#             if flag:
-#                 print("timestamp is not in order")
-#                 #order timestamp and rtt,
-#                 # values['timestamp'], values['rtt'] = zip(*sorted(zip(values['timestamp'], values['rtt'])))
-#                 # print("timestamp: ", values['timestamp'])
-#                 # print("rtt: ", values['rtt'])
-
-#             plt.plot(values['timestamp'], values['rtt'], label=f'{prob_id}')
-#     plt.xlabel('Timestamp')
-#     plt.ylabel('RTT')
-#     plt.title('Variation of RTT over Time')
-#     plt.legend()
-#     plt.show()
-
-    
-
-    
-
-
-# Plotar gráfico de linhas para cada prob_id
-# for prob_id, values in rtt_dict.items():
-#     plt.plot(values['timestamp'], values['rtt'], label=f'prob_id {prob_id}')
-
-# plt.xlabel('Timestamp')
-# plt.ylabel('RTT')
-# plt.title('Variation of RTT over Time')
-# plt.legend()
-# plt.show()
 
 # Plotar gráfico de barras comparando a quantidade de saltos das probes para um mesmo destino
 plt.figure()
-plt.bar(hops_dict.keys(), [max(hops_dict[prob_id]['hops']) for prob_id in hops_dict])
-plt.xlabel('Probe ID')
+plt.bar([rtt_dict[prob_id]['city'] for prob_id in rtt_dict], [max(hops_dict[prob_id]['hops']) for prob_id in hops_dict])
+plt.xlabel('City')
 plt.ylabel('Number of Hops')
-plt.title('Number of Hops for Each Probe')
+plt.title('Number of Hops for Each City')
 plt.show()
 
 # # Plotar gráfico de dispersão
