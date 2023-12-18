@@ -5,9 +5,9 @@ import numpy as np
 import json
 
 # Carregar dados do JSON
-with open('RIPE-Atlas-measurement-64470119.json') as f:
+with open('RIPE-Atlas-measurement-64470118.json') as f:
     data = json.load(f)
-with open('forecast.txt', 'w') as file:
+with open('windy.txt', 'w') as file:
     df = pd.DataFrame(data)
     rtt = []
     hops = []  # List to store the number of hops for each probe
@@ -23,7 +23,7 @@ with open('forecast.txt', 'w') as file:
             pass
 
 # Leitura do arquivo forecast.txt
-with open('forecast.txt', 'r') as file:
+with open('windy.txt', 'r') as file:
     lines = file.readlines()
 
 # Criar dicionário para armazenar os valores de rtt e hops por prob_id
