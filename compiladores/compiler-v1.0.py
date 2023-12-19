@@ -12,7 +12,7 @@ class ÇLexer(Lexer):
     
     # token definitions
     literals = {';', '+', '-', '*', '/', '%', '(', ')', '{', '}', ',', '=', '[', ']'}
-    tokens = {STDIO, INT, MAIN, PRINTF, STRING, NUMBER, NAME, IF, COMP, WHILE, VOID}
+    tokens = {STDIO, INT, MAIN, PRINTF, STRING, NUMBER, NAME, IF, COMP, WHILE, VOID, RETURN}
     STDIO   = '#include <stdio.h>'
     INT     = 'int'
     MAIN    = 'main'
@@ -20,6 +20,7 @@ class ÇLexer(Lexer):
     IF      = 'if'
     WHILE   = 'while'
     VOID    = 'void'
+    RETURN  = 'return'
     COMP    = r'(==|!=|>=|<=|<|>)'    
     STRING  = r'"[^"]*"'
     NUMBER  = r'\d+'
@@ -99,6 +100,20 @@ class ÇParser(Parser):
         print('\n# symbol_table: ', self.variables_list)
         self.variables_list.clear()
 
+    @_('INT function_name "{" statements "}"')
+    def function(self, p):
+        print('.end ')
+        # print('LOAD_CONST None')
+        # print('RETURN_VALUE')
+        print('\n# symbol_table: ', self.variables_list)
+        self.variables_list.clear()
+
+    # ---------------- return ----------------
+        
+    @_('RETURN expression ";"')
+    def return_st(self, p):
+        print('RETURN_VALUE')
+
     # ---------------- parameters --------------
 
     @_('')
@@ -118,8 +133,7 @@ class ÇParser(Parser):
     @_('INT MAIN "(" ")" "{" statements "}"')
     def main(self, p):
         print('LOAD_CONST None')
-        print('RETURN_VALUE')
-
+        print('RETURN_VALUE')  
 
     # ---------------- statements ----------------
 
@@ -154,6 +168,10 @@ class ÇParser(Parser):
         print()
 
     @_('while_st')
+    def statement(self, p):
+        print()
+
+    @_('return_st')
     def statement(self, p):
         print()
 
