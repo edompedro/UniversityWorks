@@ -62,7 +62,7 @@ class ÇParser(Parser):
         
     # ---------------- program ----------------
 
-    @_('stdio functions main')
+    @_('stdio functions')
     def program(self, p):
         print('\n# symbol_table: ', self.variables_list)
 
@@ -80,7 +80,7 @@ class ÇParser(Parser):
     def functions(self, p):
         pass
 
-    @_('')
+    @_('main')
     def functions(self, p):
         pass
 
@@ -175,7 +175,7 @@ class ÇParser(Parser):
     def statement(self, p):
         print()
 
-    @_('call')
+    @_('call ";"')
     def statement(self, p):
         print()
 
@@ -198,11 +198,11 @@ class ÇParser(Parser):
     def call_name(self, p):
         print('LOAD_NAME', p.NAME)
 
-    @_('call_name "(" arguments ")" ";"')
+    @_('call_name "(" arguments ")" ')
     def call(self, p):
-        # print('LOAD_NAME', p.NAME)
+        # print('LOAD_FAST', p.NAME)
         print('CALL_FUNCTION', p.arguments)
-        print('POP_TOP')
+        # print('POP_TOP')
 
     # ---------------- arguments ----------------
 
@@ -225,7 +225,7 @@ class ÇParser(Parser):
         if p.NAME in self.variables_list:
             self.show_error("variable already exist", p.lineno)
         else:
-            print('STORE_NAME', p.NAME)
+            print('STORE_FAST', p.NAME)
             self.variables_list.append(p.NAME)
 
     @_('INT NAME "[" "]" "=" "{" expressions "}" ";"')
@@ -234,7 +234,7 @@ class ÇParser(Parser):
             self.show_error("variable already exist", p.lineno)
         else:
             print('BUILD_LIST', self.array_counter)
-            print('STORE_NAME', p.NAME)
+            print('STORE_FAST', p.NAME)
             self.variables_list.append(p.NAME)
             self.array_counter = 0
     
@@ -246,23 +246,23 @@ class ÇParser(Parser):
             self.show_error(f"cannot redeclare variable '{p.NAME}'", p.lineno)
         self.variables_list.append(p.NAME)
         print('CALL_FUNCTION', 1)
-        print('STORE_NAME', p.NAME)
+        print('STORE_FAST', p.NAME)
     
     @_('')
     def array_size(self, p):
-        print("LOAD_NAME array_zero")
+        print("LOAD_FAST array_zero")
     # ---------------- attribution ----------------
 
     @_('NAME "=" expression ";"')
     def attribution(self, p): 
         if p.NAME in self.variables_list:
-            print('STORE_NAME', p.NAME)
+            print('STORE_FAST', p.NAME)
         else:
             self.show_error(f"variable '{p.NAME}' not declared", p.lineno)
 
     @_('load_array "[" expression "]" "=" expression ";"') #add um load array no lugar do name que carregue o name e dps faz o resto e tira o load name daqui
     def attribution(self, p):
-        # print('LOAD_NAME', p.NAME)
+        # print('LOAD_FAST', p.NAME)
         print('ROT_THREE')
         print('STORE_SUBSCR')
        
@@ -270,7 +270,7 @@ class ÇParser(Parser):
     @_('NAME')
     def load_array(self, p):
         if p.NAME in self.variables_list:
-            print('LOAD_NAME', p.NAME)
+            print('LOAD_FAST', p.NAME)
         else:
             self.show_error(f"variable '{p.NAME}' not declared", p.lineno)
   # ---------------- if_st ----------------
@@ -363,15 +363,19 @@ class ÇParser(Parser):
         if p.NAME not in self.variables_list:
             self.show_error(f"Variable '{p.NAME}' unknown", p.lineno)
         else:
-            print('LOAD_NAME', p.NAME)
+            print('LOAD_FAST', p.NAME)
 
     @_('load_array "[" expression "]"')
     def factor(self, p):
         # if p.NAME not in self.variables_list:
         #     self.show_error(f"Variable '{p.NAME}' unknown", p.lineno)
         # else:
-        #     print('LOAD_NAME', p.NAME)
+        #     print('LOAD_FAST', p.NAME)
         print('BINARY_SUBSCR')
+
+    @_('call')
+    def factor(self, p):
+        pass
 
 #################### MAIN ####################
 
