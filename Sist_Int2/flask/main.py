@@ -49,10 +49,12 @@ def removeUser(nome,type):
 @app.route("/signin", methods=["POST"])
 def signin():
     if request.method == "POST":
-        email = request.form["exampleInputEmail1"]
-        password = request.form["exampleInputPassword1"]
+        name = request.form["name"]
+        email = request.form["email"]
+        student_number = request.form["studentNumber"]
+        password = request.form["password"]
         app.secret_key = email
-        session["username"] = email
+        session["username"] = student_number
         print(session.items())  # dict_items([('username', value)])
         return redirect(f"/user/{app.secret_key}")
 
