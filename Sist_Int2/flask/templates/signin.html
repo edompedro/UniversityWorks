@@ -29,7 +29,17 @@
     >
       <h2 class="my-5" style="color: cornflowerblue">Flask - Login</h2>
 
-      <form action="{{url_for('login')}}" method="POST">
+      <form action="{{url_for('signin')}}" method="POST" novalidate>
+        <div class="form-group">
+          <label for="name">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            id="name"
+            placeholder="Seu nome"
+          />
+        </div>
         <div class="form-group">
           <label for="email">Endereço de email</label>
           <input
@@ -39,11 +49,20 @@
             id="email"
             aria-describedby="emailHelp"
             placeholder="Seu email"
-            required
           />
           <small id="emailHelp" class="form-text text-muted"
             >Nunca vamos compartilhar seu email, com ninguém.</small
           >
+        </div>
+        <div class="form-group">
+          <label for="studentNumber">Matricula</label>
+          <input
+            type="text"
+            class="form-control"
+            name="studentNumber"
+            id="studentNumber"
+            placeholder="Sua Matricula"
+          />
         </div>
         <div class="form-group">
           <label for="password">Senha</label>
@@ -53,8 +72,13 @@
             name="password"
             id="password"
             placeholder="Senha"
-            required
           />
+        </div>
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="isTeacher" name="isTeacher" />
+          <label class="form-check-label" for="isTeacher">
+              Sou professor(a)
+          </label>
         </div>
         <div class="form-group">
           <label style="color: brown;">        
@@ -63,8 +87,8 @@
         </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
       </form>
-      <!-- Button to redirect to signin page -->
-      <a href="{{ url_for('signin') }}" class="btn btn-secondary mt-4">Ir para Signin</a>
+      <!-- Button to redirect to login page -->
+      <a href="{{ url_for('login') }}" class="btn btn-secondary mt-4">Ir para o Login</a>
     </div>
   </body>
 </html>

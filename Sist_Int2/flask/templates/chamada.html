@@ -11,17 +11,21 @@
     <body>
         <h2> Integração com o flask - Chamadaa </h2>
         <table style='border:true'>
-            <tr >
+            <tr>
                 <th style='color:black'>Nome</th>
                 <th style='color:red'>Matricula</th>
+                <th style='color:red'>Presença</th>
             </tr>
-            {% for nome, matricula in alunos.items(): %}
+            {% for nome, obj in alunos.items(): %}
             <tr>
                 <td>
                     <p style='color:black'>{{nome}}</p>
                 </td>
                 <td>
-                    <p style='color:red'>{{matricula}}</p>
+                    <p style='color:red'>{{obj.matricula}}</p>
+                </td>
+                <td>
+                    <p style='color:red'>{{obj.presencas}}</p>
                 </td>
             </tr>
             <tr>
@@ -29,20 +33,34 @@
                     <form action="{{url_for('removeUser', nome=nome, type='DELETE')}}" method='POST'>
                         <input type="submit" value="Remover">
                     </form>
+                    <form action="{{url_for('recordPresence', nome=nome)}}" method='POST' style="display:inline;">
+                        <input type="submit" value="Registrar Presença">
+                    </form>
                 </td>
             </tr>
             {% endfor %}
-       
         </table>
+        
     </br>
     <form action="{{url_for('chamada')}}" method='POST'>
         <input type="text" id="nome" name="nome" placeholder="Nome" required>
         <input type="number" id="matricula" name="matricula" placeholder="Matricula" required>
         <input type="submit" name='type' value="Adicionar">
     </form>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+    {% if success %}
+        <div class="alert alert-success" role="alert">
+            {{ success }}
+        </div>
+    {% endif %}
     
     </br>
-    <a href={{url_for('home')}}>home</a>   
+    <a href="{{url_for('home')}}">home</a>   
     </body>
     
 </html>

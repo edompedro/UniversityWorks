@@ -1,6 +1,8 @@
-from flask import Flask, json, render_template, redirect, session, request
-from flask import redirect
+from flask import Flask, flash, json, render_template, redirect, session, request, url_for
+from database import init_db
+import operations
 
+init_db()
 app = Flask(__name__)
 
 app.secret_key = "adim"
@@ -11,7 +13,9 @@ with open("alunos.json", "r") as f:
 
 @app.route("/")
 def home():
-    return render_template("login.html")
+    if 'username' not in session:
+        return redirect("/login")
+    return render_template("home.html", username=session["username"])
 
 @app.route('/user/<username>')
 def user(username):
@@ -24,39 +28,124 @@ def about():
 
 # ROUTE TO ADD
 @app.route("/chamada", methods=["GET", "POST", "DELETE"])
-def chamada():      
-    if request.method == "POST" and request.form['type'] == 'Adicionar':
+def chamada():
+    professor_id = session.get("user_id")
+
+    if request.method == "POST" and request.form.get('type') == 'Adicionar':
         novo_nome = request.form["nome"]
         nova_matricula = request.form["matricula"]
-        print(novo_nome, nova_matricula)
-        alunos[str(novo_nome)] = int(nova_matricula)
-        # Salvar num arquivo json
-        with open("alunos.json", "w") as f:
-            json.dump(alunos, f)
+        
+        # Verificar se o usuário já existe
+        existing_user = operations.get_user_by_nome_matricula(nova_matricula, nome=novo_nome)
+        
+        if existing_user:
+            if existing_user.isTeacher:
+                alunos = operations.retrieve_students_for_professor(professor_id)
+                return render_template("chamada.html", alunos=alunos, error="Matrícula já existente para um professor")
+            
+            # Adicionar relação se o usuário for aluno
+            if operations.add_professor_student_relationship_if_exists(professor_id, nova_matricula):
+                alunos = operations.retrieve_students_for_professor(professor_id)
+                return render_template("chamada.html", alunos=alunos, success="Relação com aluno existente adicionada com sucesso")
+            else:
+                alunos = operations.retrieve_students_for_professor(professor_id)
+                return render_template("chamada.html", alunos=alunos, error="Erro ao adicionar relação com aluno existente")
+        
+        # Criar novo aluno e adicionar relação
+        aluno = operations.create_user(nome=novo_nome, senha="default_password", email=f"{novo_nome}@example.com", matricula=nova_matricula, isTeacher=False)
+        if aluno:
+            # Adicionar relação com o novo aluno
+            if operations.add_professor_student_relationship_if_exists(professor_id, aluno.matricula):
+                alunos = operations.retrieve_students_for_professor(professor_id)
+                return render_template("chamada.html", alunos=alunos, success="Novo aluno criado e relação adicionada com sucesso")
+            else:
+                alunos = operations.retrieve_students_for_professor(professor_id)
+                return render_template("chamada.html", alunos=alunos, error="Erro ao adicionar relação com novo aluno")
+        else:
+            print('asdasdasdasdasdasdasd', professor_id)
+            alunos = operations.retrieve_students_for_professor(professor_id)
+            print('professor_id', professor_id)
+            return render_template("chamada.html", alunos=alunos, error="Erro ao criar novo aluno")
 
+    # Para métodos GET e DELETE, ou se o método POST não for "Adicionar", apenas renderiza a lista de alunos
+    alunos = operations.retrieve_students_for_professor(professor_id)
     return render_template("chamada.html", alunos=alunos)
-    
+
+
 # ROUTE TO DELETE
-@app.route('/chamada/<nome>/<type>', methods=["POST"])
-def removeUser(nome,type):
-    if request.method == "POST" and type == 'DELETE':
-        del alunos[nome]
-        with open("alunos.json", "w") as f:
-            json.dump(alunos, f)
-    return render_template("chamada.html", alunos=alunos)
+@app.route('/chamada/<nome>', methods=["POST"])
+def removeUser(nome):
+    """Remove a relação entre um professor e um aluno."""
+    professor_id = session.get("user_id")
+    if request.method == "POST":
+        success = operations.remove_professor_aluno_relationship(professor_id, nome)
+        # if success:
+        #     alunos = operations.retrieve_students_for_professor(professor_id)
+        #     return render_template("chamada.html", alunos=alunos)
+        # else:
+        #     alunos = operations.retrieve_students_for_professor(professor_id)
+        #     return render_template("chamada.html", alunos=alunos)
+    return redirect(url_for("chamada"))
+
+# ROUTE TO RECORD PRESENCE
+@app.route('/presenca/<nome>', methods=["POST"])
+def recordPresence(nome):
+    """Registra a presença de um aluno."""
+    professor_id = session.get("user_id")
+    aluno = operations.get_user_by_nome(nome)
+    if aluno:
+        professor_aluno_id = operations.get_professor_aluno_id(professor_id, aluno.id)
+        if professor_aluno_id:
+            success = operations.record_presence(professor_aluno_id)
+            if success:
+                flash(f"Presença de {nome} registrada com sucesso!")
+            else:
+                flash(f"Falha ao registrar presença de {nome}.")
+    return redirect(url_for('chamada'))
+
+
+# ROUTE TO LOGIN
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+
+
+        # Verificar o login do usuário
+        user = operations.login(email=email, senha=password)
+        if user:
+            session["username"] = user.matricula
+            session["user_id"] = user.id
+            app.secret_key = email
+            return redirect("chamada") 
+        else:
+            return render_template("login.html", error="Email ou senha inválidos")
 
 # ROUTE TO SIGNIN
-@app.route("/signin", methods=["POST"])
+@app.route("/signin", methods=["GET", "POST"])
 def signin():
+    if request.method == "GET":
+        return render_template("signin.html")
     if request.method == "POST":
-        name = request.form["name"]
+        nome = request.form["name"]
         email = request.form["email"]
-        student_number = request.form["studentNumber"]
+        matricula = request.form["studentNumber"]
         password = request.form["password"]
-        app.secret_key = email
-        session["username"] = student_number
-        print(session.items())  # dict_items([('username', value)])
-        return redirect(f"/user/{app.secret_key}")
+        is_teacher = 'isTeacher' in request.form  # Verifica se o checkbox está marcado
+        # Criar o usuário
+        user = operations.create_user(nome=nome, senha=password, email=email, matricula=matricula, isTeacher=is_teacher)
+        
+        if user:            
+            session["username"] = user.matricula  # Armazenar a matrícula do aluno na sessão
+            session["user_id"] = user.id
+            app.secret_key = email  # Usar o email como chave secreta para a sessão
+            return redirect("chamada") 
+        else:
+            return render_template("signin.html", error="Não foi possível criar o usuário.")
+
 
 
 if __name__ == "__main__":
