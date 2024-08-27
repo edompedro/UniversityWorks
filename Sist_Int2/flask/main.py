@@ -8,8 +8,8 @@ app = Flask(__name__)
 app.secret_key = "adim"
 
 # abrir o json e lê os dados
-with open("alunos.json", "r") as f:
-    alunos = json.load(f)
+# with open('alunos.json', "r") as f:
+#     alunos = json.load(f)
 
 @app.route("/")
 def home():
@@ -34,7 +34,7 @@ def chamada():
     if request.method == "POST" and request.form.get('type') == 'Adicionar':
         novo_nome = request.form["nome"]
         nova_matricula = request.form["matricula"]
-        
+
         # Verificar se o usuário já existe
         existing_user = operations.get_user_by_nome_matricula(nova_matricula, nome=novo_nome)
         
@@ -44,7 +44,7 @@ def chamada():
                 return render_template("chamada.html", alunos=alunos, error="Matrícula já existente para um professor")
             
             # Adicionar relação se o usuário for aluno
-            if operations.add_professor_student_relationship_if_exists(professor_id, nova_matricula):
+            if operations.add_professor_student_relationship_if_exists(professor_id, nova_matricula, novo_nome):
                 alunos = operations.retrieve_students_for_professor(professor_id)
                 return render_template("chamada.html", alunos=alunos, success="Relação com aluno existente adicionada com sucesso")
             else:
@@ -55,7 +55,7 @@ def chamada():
         aluno = operations.create_user(nome=novo_nome, senha="default_password", email=f"{novo_nome}@example.com", matricula=nova_matricula, isTeacher=False)
         if aluno:
             # Adicionar relação com o novo aluno
-            if operations.add_professor_student_relationship_if_exists(professor_id, aluno.matricula):
+            if operations.add_professor_student_relationship_if_exists(professor_id, aluno.matricula, aluno.nome):
                 alunos = operations.retrieve_students_for_professor(professor_id)
                 return render_template("chamada.html", alunos=alunos, success="Novo aluno criado e relação adicionada com sucesso")
             else:
@@ -69,7 +69,7 @@ def chamada():
 
     # Para métodos GET e DELETE, ou se o método POST não for "Adicionar", apenas renderiza a lista de alunos
     alunos = operations.retrieve_students_for_professor(professor_id)
-    return render_template("chamada.html", alunos=alunos)
+    return render_template("chamada.html", alunos=alunos, session=session)
 
 
 # ROUTE TO DELETE
@@ -77,6 +77,7 @@ def chamada():
 def removeUser(nome):
     """Remove a relação entre um professor e um aluno."""
     professor_id = session.get("user_id")
+    print('\n\n', nome, '\n\n')
     if request.method == "POST":
         success = operations.remove_professor_aluno_relationship(professor_id, nome)
         # if success:
