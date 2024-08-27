@@ -14,29 +14,32 @@
     />
   </head>
   <body>
-    <!-- Imagem e texto -->
-    <nav class="navbar navbar-dark bg-dark justify-content-start">
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark" style="display: flex;">
+      <div class="d-flex align-items-center">
         <img
-            src='/static/logo.png'
-            width="50"
-            height="50"
-            class="d-inline-block align-top mr-4"
-            alt=""
+          src="/static/logo.png"
+          width="50"
+          height="50"
+          class="d-inline-block align-top mr-3"
+          alt="Logo"
         />
-        <h1 style="color: cornflowerblue">
-            ChamadinhaTop
-        </h1>
-        <div class="d-flex justify-content-end">
-          {% if session.get("user_id") %}
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+        <h1 style="color: cornflowerblue; margin: 0;">ChamadinhaTop</h1>
+      </div>
+      <div class="ml-auto">
+        {% if session.get("user_id") %}
+          <div class="d-flex align-items-center text-light">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle mr-2" viewBox="0 0 16 16">
               <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
               <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
             </svg>
-                <a class="btn btn-outline-light">Logout</a>
-        </div>
+            <h6 class="mb-0">{{session.get("username")}}</h6>
+            <a class="btn btn-outline-light ml-3" href="{{url_for('home')}}">Logout</a>
+          </div>
         {% else %}
-        <a href="{{url_for('login')}}" class="btn btn-outline-light">Login</a>
+          <a href="{{url_for('about')}}" class="btn btn-outline-light">About</a>
         {% endif %}
+      </div>
     </nav>
 
     <script src="" async defer></script>

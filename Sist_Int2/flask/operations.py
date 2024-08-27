@@ -47,19 +47,27 @@ def record_presence(professor_aluno_id: int, dia: datetime = None):
         db_session.rollback()
         print(f"Erro ao registrar presença: {e}")  # Log do erro para depuração
         return None
-
+    
 def remove_professor_aluno_relationship(professor_id: int, nome_aluno: str):
-    """Remove a relação entre um professor e um aluno."""
+    """Remove a relação entre um professor e um aluno, incluindo todas as presenças associadas."""
     try:
         aluno_id = db_session.query(User).filter_by(nome=nome_aluno).first().id
-        print("professor_id", professor_id, "aluno_id", aluno_id)
-        print("REMOVE PROFESSOR ALUNO RELATIONSHIP")
-        relationship = db_session.query(ProfessorAluno).filter_by(professor_id=professor_id, aluno_id=aluno_id).first()
-        if relationship:
-            db_session.delete(relationship)
+        
+        # Inicia uma transação
+        with db_session.begin_nested():
+            relationship = db_session.query(ProfessorAluno).filter_by(professor_id=professor_id, aluno_id=aluno_id).first()
+
+            if relationship:
+                # Primeiro, removemos as presenças associadas a esta relação
+                db_session.query(Presenca).filter_by(professor_aluno_id=relationship.id).delete()
+
+                # Depois, removemos a relação entre o professor e o aluno
+                db_session.delete(relationship)
+            
             db_session.commit()
             return True
         return False
+    
     except Exception as e:
         db_session.rollback()
         print(f"Erro ao remover relação professor-aluno: {e}")  # Log do erro para depuração
@@ -97,6 +105,37 @@ def retrieve_students_for_professor(professor_id: int):
         return formatted_students
     except Exception as e:
         print(f"Erro ao recuperar alunos para o professor: {e}")  # Log do erro para depuração
+        return {}
+    
+def retrieve_professors_for_students(student_id: int):
+    """Recupera todos os professores associados a um aluno específico e exibe o número de presenças com cada professor."""
+    try:
+        # Recupera todas as relações entre o aluno e seus professores
+        relationships = db_session.query(ProfessorAluno).filter_by(aluno_id=student_id).all()
+        
+        # IDs dos professores associados ao aluno
+        professor_ids = [relationship.professor_id for relationship in relationships]
+        
+        # Recupera todos os professores que têm uma relação com o aluno
+        professors = db_session.query(User).filter(User.id.in_(professor_ids), User.isTeacher == True).all()
+
+        # Cria um dicionário para mapear professor_id para o número de presenças
+        professor_presencas = {}
+        for relationship in relationships:
+            # Conta o número de presenças do aluno com o professor
+            presencas_count = db_session.query(Presenca).filter_by(professor_aluno_id=relationship.id).count()
+            professor_presencas[relationship.professor_id] = presencas_count
+        
+        # Formata os dados dos professores com o número de presenças
+        formatted_professors = {}
+        for professor in professors:
+            # Recupera o número de presenças para o aluno com o professor
+            presencas_count = professor_presencas.get(professor.id, 0)
+            formatted_professors[professor.nome] = presencas_count
+
+        return formatted_professors
+    except Exception as e:
+        print(f"Erro ao recuperar professores para o aluno: {e}")  # Log do erro para depuração
         return {}
     
 def get_user_by_nome_matricula(matricula: str,  nome: str):

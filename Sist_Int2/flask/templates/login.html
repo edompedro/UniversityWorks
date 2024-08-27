@@ -31,28 +31,28 @@
 
       <form action="{{url_for('login')}}" method="POST">
         <div class="form-group">
-          <label for="email">Endereço de email</label>
+          <label for="email">Email</label>
           <input
             type="email"
             class="form-control"
             name="email"
             id="email"
             aria-describedby="emailHelp"
-            placeholder="Seu email"
+            placeholder="example@email.com"
             required
           />
           <small id="emailHelp" class="form-text text-muted"
-            >Nunca vamos compartilhar seu email, com ninguém.</small
+            >We will never share your email with anyone.</small
           >
         </div>
         <div class="form-group">
-          <label for="password">Senha</label>
+          <label for="password">Password</label>
           <input
             type="password"
             class="form-control"
             name="password"
             id="password"
-            placeholder="Senha"
+            placeholder="********"
             required
           />
         </div>
@@ -61,10 +61,10 @@
             {{error}}        
           </label>
         </div>
-        <button type="submit" class="btn btn-primary">Enviar</button>
-      </form>
+        <button type="submit" class="btn btn-primary">Submit</button>
       <!-- Button to redirect to signin page -->
-      <a href="{{ url_for('signin') }}" class="btn btn-secondary mt-4">Ir para Signin</a>
+        <a href="{{ url_for('signin') }}" class="btn btn-secondary">Go to Signin</a>
+    </form>
     </div>
   </body>
 </html>
