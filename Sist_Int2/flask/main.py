@@ -66,9 +66,7 @@ def chamada():
                 alunos = operations.retrieve_students_for_professor(professor_id)
                 return render_template('chamada.html', alunos=alunos, error='Erro ao adicionar relação com novo aluno')
         else:
-            print('asdasdasdasdasdasdasd', professor_id)
             alunos = operations.retrieve_students_for_professor(professor_id)
-            print('professor_id', professor_id)
             return render_template('chamada.html', alunos=alunos, error='Erro ao criar novo aluno')
 
     # Para métodos GET e DELETE, ou se o método POST não for 'Adicionar', apenas renderiza a lista de alunos
@@ -81,7 +79,6 @@ def chamada():
 def removeUser(nome):
     '''Remove a relação entre um professor e um aluno.'''
     professor_id = session.get('user_id')
-    print('\n\n', nome, '\n\n')
     if request.method == 'POST':
         success = operations.remove_professor_aluno_relationship(professor_id, nome)
         # if success:
